@@ -83,7 +83,7 @@ export default class MainForm extends Component {
         reader.readAsDataURL(file);
     };
 
-    nextStep = e => {
+    checkErrors = () => {
         const {
             step,
             firstName,
@@ -93,30 +93,8 @@ export default class MainForm extends Component {
             mobile,
             city
         } = this.state;
+
         const errors = {};
-        const checkErrors = () => {
-            if (Object.keys(errors).length > 0) {
-                this.setState({
-                    errors: errors
-                });
-            } else {
-                this.setState({
-                    errors: {
-                        firstName: '',
-                        lastName: '',
-                        password: '',
-                        repeatPassword: '',
-                        age: '',
-                        email: '',
-                        mobile: ''
-                    }
-                });
-
-                this.moveToNextStep();
-            }
-        };
-
-        e.preventDefault();
 
         switch (step) {
             case 1:
@@ -168,21 +146,39 @@ export default class MainForm extends Component {
                 return;
         }
 
-        checkErrors();
+        return errors;
+    };
+
+    nextStep = e => {
+        e.preventDefault();
+
+        const errors = this.checkErrors();
+
+        if (Object.keys(errors).length > 0) {
+            this.setState({
+                errors
+            });
+        } else {
+            this.setState({
+                errors: {
+                    firstName: '',
+                    lastName: '',
+                    password: '',
+                    repeatPassword: '',
+                    age: '',
+                    email: '',
+                    mobile: ''
+                }
+            });
+
+            this.setState(prevState => ({
+                step: prevState.step + 1
+            }));
+        }
     };
 
     prevStep = e => {
         e.preventDefault();
-        this.moveToPrevStep();
-    };
-
-    moveToNextStep = () => {
-        this.setState(prevState => ({
-            step: prevState.step + 1
-        }));
-    };
-
-    moveToPrevStep = e => {
         this.setState(prevState => ({
             step: prevState.step - 1
         }));
