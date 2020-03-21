@@ -160,15 +160,7 @@ export default class MainForm extends Component {
             });
         } else {
             this.setState({
-                errors: {
-                    firstName: '',
-                    lastName: '',
-                    password: '',
-                    repeatPassword: '',
-                    age: '',
-                    email: '',
-                    mobile: ''
-                }
+                errors: {}
             });
 
             this.setState(prevState => ({
