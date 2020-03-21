@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Pagination = props => {
+const Navigation = props => {
     const { step, nextStep, prevStep } = props;
 
     return (
@@ -14,7 +14,7 @@ const Pagination = props => {
                 Previous
             </button>
             <button
-                type="button"
+                type="submit"
                 className="btn btn-secondary"
                 onClick={nextStep}
             >
@@ -24,4 +24,4 @@ const Pagination = props => {
     );
 };
 
-export default Pagination;
+export default Navigation;

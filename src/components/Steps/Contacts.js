@@ -1,20 +1,13 @@
 import React from 'react';
-import Field from './Fields/Field';
-import SelectField from './Fields/SelectField';
-import countries from '../data/countries';
-import cities from '../data/cities';
+import Field from '../Fields/Field';
+import SelectField from '../Fields/SelectField';
+import countries from '../../data/countries';
+import cities from '../../data/cities';
 
 const Contacts = props => {
-    const {
-        email,
-        onChange,
-        errors,
-        mobile,
-        country,
-        city,
-        getOptionItems,
-        getCitiesOptions
-    } = props;
+    const { email, mobile, country, city } = props.values;
+
+    const { onChange, errors, getOptionItems, getCitiesOptions } = props;
 
     return (
         <>

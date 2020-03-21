@@ -1,10 +1,18 @@
 import React from 'react';
-import countries from '../data/countries';
-import cities from '../data/cities';
+import countries from '../../data/countries';
+import cities from '../../data/cities';
 
 const Finish = props => {
-    const { avatar, firstName, lastName, email, mobile, country, city } = props;
-    const selectedCountry = countries.find(item => item.id === +country);
+    const {
+        avatar,
+        firstName,
+        lastName,
+        email,
+        mobile,
+        country,
+        city
+    } = props.values;
+    const selectedCountry = countries.find(item => item.id === Number(country));
 
     return (
         <div className="container-fluid">

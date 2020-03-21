@@ -1,16 +1,16 @@
 import React from 'react';
-import Field from './Fields/Field';
+import Field from '../Fields/Field';
 
 const Basic = props => {
     const {
         firstName,
         lastName,
-        onChange,
-        errors,
         gender,
         password,
         repeatPassword
-    } = props;
+    } = props.values;
+
+    const { errors, onChange } = props;
 
     return (
         <>

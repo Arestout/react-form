@@ -18,7 +18,6 @@ const Field = props => {
             <label htmlFor={id}>{labelText}</label>
             <input
                 type={type}
-                // className="form-control"
                 className={classNames('form-control', { invalid: error })}
                 placeholder={placeholder}
                 id={id}

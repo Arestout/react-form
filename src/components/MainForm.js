@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
-import Basic from './Basic';
-import Contacts from './Contacts';
-import Avatar from './Avatar';
-import Finish from './Finish';
-import Pagination from './Buttons/Pagination';
+import Basic from './Steps/Basic';
+import Contacts from './Steps/Contacts';
+import Avatar from './Steps/Avatar';
+import Finish from './Steps/Finish';
+import Navigation from './Buttons/Navigation';
 import Reset from './Buttons/Reset';
-import Steps from './StepsBox';
-import defaultAvatar from '../img/default-avatar.png';
+import StepsBox from './StepsBox';
+
+const REGEX_NAME = new RegExp(/^[a-z ,.'-]{5,}$/i);
+const REGEX_EMAIL = new RegExp(
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+);
+const REGEX_MOBILE = new RegExp(/^(\+\d{1,3}[- ]?)?\d{10}$/gm);
 
 export default class MainForm extends Component {
     constructor() {
@@ -14,41 +19,33 @@ export default class MainForm extends Component {
 
         this.state = {
             step: 1,
-            firstName: '',
-            lastName: '',
-            password: '',
-            repeatPassword: '',
-            gender: 'male',
-            email: '',
-            mobile: '',
-            country: '',
-            city: '',
-            avatar: defaultAvatar,
-            errors: {
+            values: {
                 firstName: '',
                 lastName: '',
                 password: '',
                 repeatPassword: '',
-                age: '',
+                gender: 'male',
                 email: '',
                 mobile: '',
-                location: ''
-            }
+                country: '',
+                city: '',
+                avatar: ''
+            },
+            errors: {}
         };
     }
 
     onChange = event => {
         const { name, value } = event.target;
-        this.setState({
-            [name]: value
-        });
+        this.setState(state => ({
+            values: {
+                ...state.values,
+                [name]: value
+            }
+        }));
     };
 
     getOptionItems = items => {
-        console.log(
-            'Country',
-            items.filter(item => item.id === this.state.country)
-        );
         return items.map(item => (
             <option key={item.id} value={item.id}>
                 {item.name}
@@ -57,11 +54,11 @@ export default class MainForm extends Component {
     };
 
     getCitiesOptions = items => {
-        const country = +this.state.country;
+        const country = Number(this.state.values.country);
         const filteredCities = Object.entries(items).filter(
             el => el[1].country === country
         );
-        console.log('Filtered', filteredCities);
+
         return filteredCities.map(([id, city]) => (
             <option key={id} value={id}>
                 {city.name}
@@ -69,65 +66,45 @@ export default class MainForm extends Component {
         ));
     };
 
-    changeAvatar = event => {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = event => {
-            this.setState({
-                avatar: event.target.result
-            });
-        };
-        reader.onerror = event => {
-            console.error(event);
-        };
-        reader.readAsDataURL(file);
-    };
-
     checkErrors = () => {
         const {
-            step,
             firstName,
             lastName,
             password,
+            repeatPassword,
             email,
             mobile,
-            city
-        } = this.state;
-
+            city,
+            avatar
+        } = this.state.values;
+        const { step } = this.state;
         const errors = {};
 
         switch (step) {
             case 1:
-                const nameRegex = new RegExp(/^[a-z ,.'-]{5,}$/i);
-
-                if (!nameRegex.test(firstName)) {
+                if (!REGEX_NAME.test(firstName)) {
                     errors.firstName = 'Must be 5 characters or more';
                 }
 
-                if (!nameRegex.test(lastName)) {
+                if (!REGEX_NAME.test(lastName)) {
                     errors.lastName = 'Must be 5 characters or more';
                 }
 
-                if (this.state.password.length < 8) {
-                    errors.password = 'Must be 8 characters or more';
+                if (password.length < 5) {
+                    errors.password = 'Must be 5 characters or more';
                 }
 
-                if (this.state.repeatPassword !== password) {
+                if (repeatPassword !== password) {
                     errors.repeatPassword = 'Must be equal passwords';
                 }
                 break;
 
             case 2:
-                const emailRegex = new RegExp(
-                    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                );
-                const mobileRegex = new RegExp(/^(\+\d{1,3}[- ]?)?\d{10}$/gm);
-
-                if (!emailRegex.test(email)) {
+                if (!REGEX_EMAIL.test(email)) {
                     errors.email = 'Invalid email address';
                 }
 
-                if (!mobileRegex.test(mobile)) {
+                if (!REGEX_MOBILE.test(mobile)) {
                     errors.mobile = 'Invalid mobile number';
                 }
 
@@ -137,13 +114,12 @@ export default class MainForm extends Component {
                 break;
 
             case 3:
-                if (this.state.avatar === defaultAvatar) {
+                if (avatar === '') {
                     errors.avatar = 'Required';
                 }
                 break;
 
             default:
-                return;
         }
 
         return errors;
@@ -159,101 +135,75 @@ export default class MainForm extends Component {
                 errors
             });
         } else {
-            this.setState({
+            this.setState(state => ({
+                step: state.step + 1,
                 errors: {}
-            });
-
-            this.setState(prevState => ({
-                step: prevState.step + 1
             }));
         }
     };
 
-    prevStep = e => {
-        e.preventDefault();
-        this.setState(prevState => ({
-            step: prevState.step - 1
+    prevStep = () => {
+        this.setState(state => ({
+            step: state.step - 1
         }));
     };
 
     resetForm = () => {
         this.setState({
             step: 1,
-            firstName: '',
-            lastName: '',
-            password: '',
-            repeatPassword: '',
-            gender: 'male',
-            email: '',
-            mobile: '',
-            country: '',
-            city: '',
-            avatar: defaultAvatar,
-            errors: {
+            values: {
                 firstName: '',
                 lastName: '',
                 password: '',
                 repeatPassword: '',
-                age: '',
+                gender: 'male',
                 email: '',
                 mobile: '',
-                location: ''
-            }
+                country: '',
+                city: '',
+                avatar: ''
+            },
+            errors: {}
         });
     };
 
     render() {
-        return (
-            <>
-                <Steps step={this.state.step} />
+        const { step } = this.state;
 
-                {this.state.step === 1 ? (
+        return (
+            <form className="form card-body">
+                <StepsBox step={step} />
+
+                {step === 1 ? (
                     <Basic
-                        firstName={this.state.firstName}
-                        lastName={this.state.lastName}
-                        password={this.state.password}
-                        repeatPassword={this.state.repeatPassword}
+                        values={this.state.values}
                         onChange={this.onChange}
                         errors={this.state.errors}
-                        gender={this.state.gender}
                     />
                 ) : null}
 
-                {this.state.step === 2 ? (
+                {step === 2 ? (
                     <Contacts
-                        email={this.state.email}
-                        mobile={this.state.mobile}
+                        values={this.state.values}
                         onChange={this.onChange}
                         errors={this.state.errors}
-                        country={this.state.country}
-                        city={this.state.city}
                         getOptionItems={this.getOptionItems}
                         getCitiesOptions={this.getCitiesOptions}
                     />
                 ) : null}
 
-                {this.state.step === 3 ? (
+                {step === 3 ? (
                     <Avatar
-                        avatar={this.state.avatar}
-                        changeAvatar={this.changeAvatar}
-                        error={this.state.errors.avatar}
+                        avatar={this.state.values.avatar}
+                        onChange={this.onChange}
+                        errors={this.state.errors}
                     />
                 ) : null}
 
-                {this.state.step === 4 ? (
-                    <Finish
-                        avatar={this.state.avatar}
-                        firstName={this.state.firstName}
-                        lastName={this.state.lastName}
-                        email={this.state.email}
-                        mobile={this.state.mobile}
-                        country={this.state.country}
-                        city={this.state.city}
-                    />
-                ) : null}
+                {step === 4 ? <Finish values={this.state.values} /> : null}
 
-                {this.state.step < 4 ? (
-                    <Pagination
+                {step < 4 ? (
+                    <Navigation
                         nextStep={this.nextStep}
                         prevStep={this.prevStep}
                         step={this.state.step}
@@ -261,7 +211,7 @@ export default class MainForm extends Component {
                 ) : (
                     <Reset resetForm={this.resetForm} />
                 )}
-            </>
+            </form>
         );
     }
 }
