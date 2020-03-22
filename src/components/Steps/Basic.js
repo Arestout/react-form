@@ -1,5 +1,5 @@
 import React from 'react';
-import Field from '../Fields/Field';
+import Field from './Fields/Field';
 
 const Basic = props => {
     const {

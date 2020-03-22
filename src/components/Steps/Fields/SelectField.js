@@ -6,11 +6,11 @@ const SelectField = props => {
         id,
         value,
         labelText,
-        location,
         name,
         onChange,
         error,
-        getOptions
+        defaultOption,
+        options
     } = props;
 
     return (
@@ -23,8 +23,8 @@ const SelectField = props => {
                 name={name}
                 onChange={onChange}
             >
-                <option value="">Choose your {name}</option>
-                {getOptions(location)}
+                <option value="">{defaultOption}</option>
+                {options}
             </select>
             {error ? <div className="invalid-feedback">{error}</div> : null}
         </div>

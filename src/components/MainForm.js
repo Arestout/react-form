@@ -3,15 +3,15 @@ import Basic from './Steps/Basic';
 import Contacts from './Steps/Contacts';
 import Avatar from './Steps/Avatar';
 import Finish from './Steps/Finish';
-import Navigation from './Buttons/Navigation';
-import Reset from './Buttons/Reset';
-import StepsBox from './StepsBox';
+import Navigation from './Steps/Navigation';
+import Reset from './Steps/Reset';
+import StepsBox from './Steps/StepsBox';
 
-const REGEX_NAME = new RegExp(/^[a-z ,.'-]{5,}$/i);
-const REGEX_EMAIL = new RegExp(
+const REGEXP_NAME = new RegExp(/^[a-z ,.'-]{5,}$/i);
+const REGEXP_EMAIL = new RegExp(
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 );
-const REGEX_MOBILE = new RegExp(/^(\+\d{1,3}[- ]?)?\d{10}$/gm);
+const REGEXP_MOBILE = new RegExp(/^(\+?\d{1,4}[\s-])?(?!0+\s+,?$)\d{10}\s*,?$/);
 
 export default class MainForm extends Component {
     constructor() {
@@ -37,33 +37,20 @@ export default class MainForm extends Component {
 
     onChange = event => {
         const { name, value } = event.target;
+        if (name === 'country') {
+            this.setState(state => ({
+                values: {
+                    ...state.values,
+                    city: ''
+                }
+            }));
+        }
         this.setState(state => ({
             values: {
                 ...state.values,
                 [name]: value
             }
         }));
-    };
-
-    getOptionItems = items => {
-        return items.map(item => (
-            <option key={item.id} value={item.id}>
-                {item.name}
-            </option>
-        ));
-    };
-
-    getCitiesOptions = items => {
-        const country = Number(this.state.values.country);
-        const filteredCities = Object.entries(items).filter(
-            el => el[1].country === country
-        );
-
-        return filteredCities.map(([id, city]) => (
-            <option key={id} value={id}>
-                {city.name}
-            </option>
-        ));
     };
 
     checkErrors = () => {
@@ -74,6 +61,7 @@ export default class MainForm extends Component {
             repeatPassword,
             email,
             mobile,
+            country,
             city,
             avatar
         } = this.state.values;
@@ -82,11 +70,11 @@ export default class MainForm extends Component {
 
         switch (step) {
             case 1:
-                if (!REGEX_NAME.test(firstName)) {
+                if (!REGEXP_NAME.test(firstName)) {
                     errors.firstName = 'Must be 5 characters or more';
                 }
 
-                if (!REGEX_NAME.test(lastName)) {
+                if (!REGEXP_NAME.test(lastName)) {
                     errors.lastName = 'Must be 5 characters or more';
                 }
 
@@ -100,16 +88,20 @@ export default class MainForm extends Component {
                 break;
 
             case 2:
-                if (!REGEX_EMAIL.test(email)) {
+                if (!REGEXP_EMAIL.test(email)) {
                     errors.email = 'Invalid email address';
                 }
 
-                if (!REGEX_MOBILE.test(mobile)) {
+                if (!REGEXP_MOBILE.test(mobile)) {
                     errors.mobile = 'Invalid mobile number';
                 }
 
+                if (country === '') {
+                    errors.country = 'Required';
+                }
+
                 if (city === '') {
-                    errors.location = 'Required';
+                    errors.city = 'Required';
                 }
                 break;
 
@@ -118,8 +110,6 @@ export default class MainForm extends Component {
                     errors.avatar = 'Required';
                 }
                 break;
-
-            default:
         }
 
         return errors;
@@ -174,33 +164,31 @@ export default class MainForm extends Component {
             <form className="form card-body">
                 <StepsBox step={step} />
 
-                {step === 1 ? (
+                {step === 1 && (
                     <Basic
                         values={this.state.values}
                         onChange={this.onChange}
                         errors={this.state.errors}
                     />
-                ) : null}
+                )}
 
                 {step === 2 ? (
                     <Contacts
                         values={this.state.values}
                         onChange={this.onChange}
                         errors={this.state.errors}
-                        getOptionItems={this.getOptionItems}
-                        getCitiesOptions={this.getCitiesOptions}
                     />
                 ) : null}
 
-                {step === 3 ? (
+                {step === 3 && (
                     <Avatar
                         avatar={this.state.values.avatar}
                         onChange={this.onChange}
                         errors={this.state.errors}
                     />
-                ) : null}
+                )}
 
-                {step === 4 ? <Finish values={this.state.values} /> : null}
+                {step === 4 && <Finish values={this.state.values} />}
 
                 {step < 4 ? (
                     <Navigation

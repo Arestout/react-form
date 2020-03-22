@@ -35,8 +35,8 @@ const Finish = props => {
                         <strong>Mobile:</strong> {mobile}
                     </p>
                     <p>
-                        <strong>Location:</strong> {selectedCountry.name},{' '}
-                        {cities[city].name}
+                        <strong>Location:</strong> {selectedCountry?.name},{' '}
+                        {cities[city]?.name}
                     </p>
                 </div>
             </div>
