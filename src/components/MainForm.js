@@ -3,9 +3,9 @@ import Basic from './Steps/Basic';
 import Contacts from './Steps/Contacts';
 import Avatar from './Steps/Avatar';
 import Finish from './Steps/Finish';
-import Navigation from './Steps/Navigation';
-import Reset from './Steps/Reset';
-import StepsBox from './Steps/StepsBox';
+import Navigation from './Navigation';
+import Reset from './Reset';
+import StepsBox from './StepsBox';
 
 const REGEXP_NAME = new RegExp(/^[a-z ,.'-]{5,}$/i);
 const REGEXP_EMAIL = new RegExp(
@@ -36,7 +36,9 @@ export default class MainForm extends Component {
     }
 
     onChange = event => {
-        const { name, value } = event.target;
+        const {
+            target: { name, value }
+        } = event;
         if (name === 'country') {
             this.setState(state => ({
                 values: {
@@ -110,6 +112,8 @@ export default class MainForm extends Component {
                     errors.avatar = 'Required';
                 }
                 break;
+
+            default:
         }
 
         return errors;
@@ -158,7 +162,7 @@ export default class MainForm extends Component {
     };
 
     render() {
-        const { step } = this.state;
+        const { step, values, errors } = this.state;
 
         return (
             <form className="form card-body">
@@ -166,35 +170,35 @@ export default class MainForm extends Component {
 
                 {step === 1 && (
                     <Basic
-                        values={this.state.values}
+                        values={values}
                         onChange={this.onChange}
-                        errors={this.state.errors}
+                        errors={errors}
                     />
                 )}
 
                 {step === 2 ? (
                     <Contacts
-                        values={this.state.values}
+                        values={values}
                         onChange={this.onChange}
-                        errors={this.state.errors}
+                        errors={errors}
                     />
                 ) : null}
 
                 {step === 3 && (
                     <Avatar
-                        avatar={this.state.values.avatar}
+                        avatar={values.avatar}
                         onChange={this.onChange}
-                        errors={this.state.errors}
+                        errors={errors}
                     />
                 )}
 
-                {step === 4 && <Finish values={this.state.values} />}
+                {step === 4 && <Finish values={values} />}
 
                 {step < 4 ? (
                     <Navigation
                         nextStep={this.nextStep}
                         prevStep={this.prevStep}
-                        step={this.state.step}
+                        step={step}
                     />
                 ) : (
                     <Reset resetForm={this.resetForm} />
